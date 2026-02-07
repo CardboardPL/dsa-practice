@@ -18,5 +18,77 @@ Goal:
 import { Queue } from '../../../existing_data_structures/Queue.js';
 
 export function shortestPathInAGrid(grid) {
-    
+    if (grid[0][0] === 1) return -1;
+
+    const queue = new Queue();
+    const visited = new Set().add('0,0');
+    queue.enqueue({
+        coords: [0,0],
+        stepCount: 0
+    });
+
+    // Create a helper
+    const queueCell = (currRowNumber, currColumnNumber, newStepCount) => {
+        if (!visited.has(`${currRowNumber},${currColumnNumber}`)) {
+            queue.enqueue({
+                coords: [currRowNumber, currColumnNumber],
+                stepCount: newStepCount
+            });
+            visited.add(`${currRowNumber},${currColumnNumber}`);
+        }
+    }
+
+    // Process each cell
+    while(queue.queueSize()) {
+        const cellData = queue.dequeue();
+
+        // m = row number, n = column number
+        const [m, n] = cellData.coords;
+
+        // Winning Condition (reaching the end)
+        if (m === grid.length - 1 && n === grid[0].length - 1) {
+            return cellData.stepCount;
+        }
+
+        const newStepCount = cellData.stepCount + 1;
+        
+        // Check Up and Down
+        let currRowNumber = m - 1;
+        let currColumnNumber = n;
+
+        // Check Up
+        if (grid[currRowNumber] != null && grid[currRowNumber][currColumnNumber] === 0) {
+            queueCell(currRowNumber, currColumnNumber, newStepCount);
+        }
+
+        // Check Down
+        currRowNumber = m + 1;
+        if (grid[currRowNumber] != null && grid[currRowNumber][currColumnNumber] === 0) {
+            queueCell(currRowNumber, currColumnNumber, newStepCount);
+        }
+
+        // Check Left and Right
+        currRowNumber = m;
+        currColumnNumber = n - 1;
+
+        // Check Left
+        if (grid[currRowNumber][currColumnNumber] === 0) {
+            queueCell(currRowNumber, currColumnNumber, newStepCount);
+        }
+        
+        // Check Right
+        currColumnNumber = n + 1;
+        if (grid[currRowNumber][currColumnNumber] === 0) {
+            queueCell(currRowNumber, currColumnNumber, newStepCount);
+        }
+    }
+
+    // Winning condition not reached
+    return -1;
 }
+
+console.log(shortestPathInAGrid([
+    [0, 0, 0, 1, 0, 0, 0],
+    [1, 1, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 1, 0]
+]))
